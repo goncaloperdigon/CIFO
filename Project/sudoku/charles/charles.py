@@ -7,12 +7,53 @@ import numpy
 with open('sudoku_data.txt') as f:
     initial_data = numpy.loadtxt(f).reshape((9, 9)).astype(int)
 
+    #pencil mark method
+    def pencil_mark(i,j):
+        pencil_list = [1,2,3,4,5,6,7,8,9]
+
+        #Get values from the same row and remove from pencil_list
+        for column in range(0,9):
+            if (initial_data[i][column] != 0 and initial_data[i][column] in pencil_list):
+                pencil_list.remove(initial_data[i][column])
+
+        #Get values from the same column and remove from pencil_list
+        for row in range(0, 9):
+            if (initial_data[row][j] != 0 and initial_data[row][j] in pencil_list):
+                pencil_list.remove(initial_data[row][j])
+
+        #Get values from the same grid (3x3) and remove from pencil_list
+        for a in range(0, 9, 3):
+            for b in range(0, 9, 3):
+                #if i,j are between...
+                if (i >= a and i <= a + 2):
+                    if (j >= b and j <= b + 2):
+                        #then find the values from that grid
+                        for k in find_grid(a, b):
+                            if (k != 0 and k in pencil_list):
+                                pencil_list.remove(k)
+
+        return pencil_list
+
+    #returns the values of a grid
+    def find_grid(i,j):
+        grid_list = []
+
+        grid_list.append(initial_data[i][j])
+        grid_list.append(initial_data[i][j + 1])
+        grid_list.append(initial_data[i][j + 2])
+        grid_list.append(initial_data[i + 1][j])
+        grid_list.append(initial_data[i + 2][j])
+        grid_list.append(initial_data[i + 1][j + 1])
+        grid_list.append(initial_data[i + 1][j + 2])
+        grid_list.append(initial_data[i + 2][j + 1])
+        grid_list.append(initial_data[i + 2][j + 2])
+
+        return grid_list
+
 class Individual:
     def __init__(
         self,
         representation=None,
-        size=None,
-        valid_set=None,
         initial_set=initial_data
     ):
         if representation is None:
@@ -21,7 +62,7 @@ class Individual:
                 for column in range(0, 9):
                     if initial_set[row][column] == 0:
                         # Value is available.
-                        self.representation[row][column] = choice(valid_set)
+                            self.representation[row][column] = choice(pencil_mark(row,column))
                     elif initial_set[row][column] != 0:
                         # Given/known value from file.
                         self.representation[row][column] = initial_set[row][column]
@@ -29,6 +70,7 @@ class Individual:
             self.representation = representation
 
         self.fitness = self.get_fitness()
+
 
     def get_fitness(self):
         raise Exception("You need to monkey patch the fitness path.")
@@ -61,9 +103,7 @@ class Population:
 
         for _ in range(size):
             self.individuals.append(
-                Individual(
-                  valid_set=kwargs["valid_set"],
-                )
+                Individual()
             )
 
     def evolve(self, gens, select, crossover, mutate, co_p, mu_p, elitism):
@@ -106,9 +146,9 @@ class Population:
             self.individuals = new_pop
 
             if self.optim == "max":
-                print(f'Best Individual: {max(self, key=attrgetter("fitness"))}')
+                print(f'Gen {gen}' + " - " + f'Best Individual: {max(self, key=attrgetter("fitness"))}')
             elif self.optim == "min":
-                print(f'Best Individual: {min(self, key=attrgetter("fitness"))}')
+                print(f'Gen {gen}' + " - " + f'Best Individual: {min(self, key=attrgetter("fitness"))}')
 
     def __len__(self):
         return len(self.individuals)

@@ -2,8 +2,8 @@ from charles.charles import Population, Individual
 from charles.search import hill_climb, sim_annealing
 from copy import deepcopy
 from charles.selection import fps, tournament
-from charles.mutation import swap_mutation, inversion_mutation
-from charles.crossover import cycle_co, pmx_co, new_pmx_co , row_crossover
+from charles.mutation import swap_row_mutation, inversion_mutation, swap_column_mutation, random_mutation
+from charles.crossover import cycle_co, pmx_co, new_pmx_co, row_crossover
 import numpy
 
 
@@ -56,7 +56,12 @@ def get_fitness(self):
             sum(num_of_duplicates.values())
             fitness += sum(num_of_duplicates.values())
 
-    return int(fitness)
+        if fitness != 0:
+            max_fitness = 1/fitness
+        else:
+            max_fitness = 1
+
+    return  fitness
 
 
 '''def get_neighbours(self):
@@ -82,18 +87,17 @@ Individual.get_fitness = get_fitness
 
 
 pop = Population(
-    size=200,
-    valid_set=[1,2,3,4,5,6,7,8,9],
+    size= 1000,
     optim="min",
 )
 #print(pop.individuals[0].representation)
 
 pop.evolve(
-    gens=1000,
+    gens= 1000,
     select=tournament,
-    crossover=row_crossover,
-    mutate=inversion_mutation,
-    co_p=0.8,
-    mu_p=0.2,
+    crossover=new_pmx_co,
+    mutate=random_mutation,
+    co_p=0.9,
+    mu_p=0.1,
     elitism=True
 )

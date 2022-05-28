@@ -1,5 +1,5 @@
 from matplotlib import pyplot as plt
-
+import numpy as np
 '''
 def plot_c(c, alpha, threshold):
     """ A function to visualize the changing c value (vertical) and
@@ -89,5 +89,6 @@ for i in range(0, 9, 3):
         # sum all the appearances of duplicates
         sum(num_of_duplicates.values())
         fitness += sum(num_of_duplicates.values())
-
-print(numpy.array(representation).flatten(order='C'))
+x = [[4, 3, 9, 2, 7, 8, 6, 5, 1], [5, 8, 4, 1, 4, 6, 7, 2, 9], [6, 2, 1, 5, 6, 9, 4, 8, 3], [1, 9, 3, 2, 5, 8, 7, 6, 4], [6, 5, 8, 4, 3, 2, 9, 1, 7], [2, 4, 7, 7, 1, 9, 5, 3, 8], [4, 5, 2, 7, 4, 1, 8, 9, 3], [9, 7, 4, 3, 8, 5, 6, 1, 2], [3, 1, 8, 6, 2, 9, 5, 7, 4]]
+x = np.reshape(x,(9, 9))
+print(x)
