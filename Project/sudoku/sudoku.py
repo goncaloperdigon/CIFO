@@ -1,7 +1,7 @@
 from charles.charles import Population, Individual
 from charles.search import hill_climb, sim_annealing
 from copy import deepcopy
-from charles.selection import fps, tournament
+from charles.selection import fps, tournament , ranking
 from charles.mutation import swap_row_mutation, inversion_mutation, swap_column_mutation, random_mutation
 from charles.crossover import cycle_co, pmx_co, new_pmx_co, row_crossover
 import numpy
@@ -93,8 +93,8 @@ pop = Population(
 #print(pop.individuals[0].representation)
 
 pop.evolve(
-    gens= 1000,
-    select=tournament,
+    gens=1000,
+    select=ranking,
     crossover=new_pmx_co,
     mutate=random_mutation,
     co_p=0.9,

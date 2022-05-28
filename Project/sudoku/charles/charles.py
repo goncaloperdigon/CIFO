@@ -7,35 +7,37 @@ import numpy
 with open('sudoku_data.txt') as f:
     initial_data = numpy.loadtxt(f).reshape((9, 9)).astype(int)
 
-    #pencil mark method
-    def pencil_mark(i,j):
-        pencil_list = [1,2,3,4,5,6,7,8,9]
 
-        #Get values from the same row and remove from pencil_list
-        for column in range(0,9):
-            if (initial_data[i][column] != 0 and initial_data[i][column] in pencil_list):
+    # pencil mark method
+    def pencil_mark(i, j):
+        pencil_list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+        # Get values from the same row and remove from pencil_list
+        for column in range(0, 9):
+            if initial_data[i][column] != 0 and initial_data[i][column] in pencil_list:
                 pencil_list.remove(initial_data[i][column])
 
-        #Get values from the same column and remove from pencil_list
+        # Get values from the same column and remove from pencil_list
         for row in range(0, 9):
-            if (initial_data[row][j] != 0 and initial_data[row][j] in pencil_list):
+            if initial_data[row][j] != 0 and initial_data[row][j] in pencil_list:
                 pencil_list.remove(initial_data[row][j])
 
-        #Get values from the same grid (3x3) and remove from pencil_list
+        # Get values from the same grid (3x3) and remove from pencil_list
         for a in range(0, 9, 3):
             for b in range(0, 9, 3):
-                #if i,j are between...
+                # if i,j are between...
                 if (i >= a and i <= a + 2):
                     if (j >= b and j <= b + 2):
-                        #then find the values from that grid
+                        # then find the values from that grid
                         for k in find_grid(a, b):
                             if (k != 0 and k in pencil_list):
                                 pencil_list.remove(k)
 
         return pencil_list
 
-    #returns the values of a grid
-    def find_grid(i,j):
+
+    # returns the values of a grid
+    def find_grid(i, j):
         grid_list = []
 
         grid_list.append(initial_data[i][j])
@@ -50,19 +52,20 @@ with open('sudoku_data.txt') as f:
 
         return grid_list
 
+
 class Individual:
     def __init__(
-        self,
-        representation=None,
-        initial_set=initial_data
+            self,
+            representation=None,
+            initial_set=initial_data
     ):
         if representation is None:
-            self.representation= [[[] for j in range(0, 9)] for i in range(0, 9)]
+            self.representation = [[[] for j in range(0, 9)] for i in range(0, 9)]
             for row in range(0, 9):
                 for column in range(0, 9):
                     if initial_set[row][column] == 0:
                         # Value is available.
-                            self.representation[row][column] = choice(pencil_mark(row,column))
+                        self.representation[row][column] = choice(pencil_mark(row, column))
                     elif initial_set[row][column] != 0:
                         # Given/known value from file.
                         self.representation[row][column] = initial_set[row][column]
@@ -70,7 +73,6 @@ class Individual:
             self.representation = representation
 
         self.fitness = self.get_fitness()
-
 
     def get_fitness(self):
         raise Exception("You need to monkey patch the fitness path.")
@@ -100,7 +102,6 @@ class Population:
         self.size = size
         self.optim = optim
 
-
         for _ in range(size):
             self.individuals.append(
                 Individual()
@@ -108,11 +109,10 @@ class Population:
 
     def evolve(self, gens, select, crossover, mutate, co_p, mu_p, elitism):
 
-
         for gen in range(gens):
             new_pop = []
 
-            if elitism == True:
+            if elitism:
                 if self.optim == "max":
                     elite = deepcopy(max(self.individuals, key=attrgetter("fitness")))
                 elif self.optim == "min":
@@ -135,7 +135,7 @@ class Population:
                 if len(new_pop) < self.size:
                     new_pop.append(Individual(representation=offspring2))
 
-            if elitism == True:
+            if elitism:
                 if self.optim == "max":
                     least = min(new_pop, key=attrgetter("fitness"))
                 elif self.optim == "min":

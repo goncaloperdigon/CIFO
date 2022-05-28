@@ -1,4 +1,4 @@
-from random import uniform, choice
+from random import uniform, choice, sample
 from operator import attrgetter
 
 
@@ -31,7 +31,7 @@ def fps(population):
         raise Exception("No optimization specified (min or max).")
 
 
-def tournament(population, size= 50):
+def tournament(population, size=50):
     """Tournament selection implementation.
 
     Args:
@@ -52,3 +52,17 @@ def tournament(population, size= 50):
     else:
         raise Exception("No optimization specified (min or max).")
 
+
+def ranking(population):
+    ranking = [choice(population.individuals) for i in range(population.size)]
+
+    top_half_size = int(population.size/2)
+    if population.optim == 'max':
+        fitness_ranking = sorted(ranking, key=attrgetter("fitness"), reverse=True)
+
+        return sample(fitness_ranking[:top_half_size], 1)
+    elif population.optim == 'min':
+        fitness_ranking = sorted(ranking, key=attrgetter("fitness"), reverse=False)
+        return sample(fitness_ranking[:top_half_size], 1)
+    else:
+        raise Exception("No optimization specified (min or max).")
