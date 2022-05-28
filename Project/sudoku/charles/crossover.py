@@ -248,6 +248,34 @@ def find_value(parent_row, value):
         if (parent_row[i] == value):
             return i'''
 
+def row_crossover (p1 , p2):
+    """Implementation of specific sudoku crossover, where several rows
+    are switched entirely and at random
+
+    Args:
+        Args:
+        p1 (Individual): First parent for crossover.
+        p2 (Individual): Second parent for crossover.
+
+    Returns:
+        Individuals: Two offspring, resulting from the crossover."""
+
+    num_crossover_points = randint(2, 7)
+    row_indexes = [0, 1, 2, 3, 4, 5, 6, 7, 8]
+    crossover_points = []
+
+    for i in range(num_crossover_points):
+        crossover_points.append(row_indexes.pop(randint(0, num_crossover_points - 1)))
+
+    offspring1 = p1
+    offspring2 = p2
+
+    for i in enumerate(crossover_points):
+        offspring1[i] = p2[i]
+        offspring2[i] = p1[i]
+
+    return offspring1,  offspring2
+
 
 if __name__ == '__main__':
     p1, p2 = [[9, 8, 4], [5, 6, 7], [1, 3, 2]], [[9, 7, 1], [2, 3, 10], [8, 5, 4]]
