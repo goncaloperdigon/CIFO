@@ -73,6 +73,7 @@ Individual.get_fitness = get_fitness
 
 time = []
 number_gens = []
+failed_runs = 0
 
 for _ in range(40):
     pop = Population(
@@ -91,8 +92,10 @@ for _ in range(40):
         mu_p=0.1,
         elitism = True
     )
-    time.append(pop.time_taken)
-    number_gens.append(pop.last_gen)
+    if pop.last_gen != 0:
+        number_gens.append(pop.last_gen)
+        time.append(pop.time_taken)
+    else: failed_runs += 1
 
 
 print(round(numpy.average(time),3))
