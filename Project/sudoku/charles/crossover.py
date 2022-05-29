@@ -112,6 +112,7 @@ def pmx_co(p1, p2):
     # repeat the procedure for each offspring
     o1 = pmx(p1, p2)
     o2 = pmx(p2, p1)
+
     #return the offsprings as 9x9 2D list
     return np.array(o1).reshape((9, 9)).astype(int).tolist(), np.array(o2).reshape((9, 9)).astype(int).tolist()
 

@@ -10,7 +10,7 @@ with open('sudoku_data.txt') as f:
 
     # pencil mark method
     def pencil_mark(i, j):
-        pencil_list = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        pencil_list = [i for i in range(1,10)]
 
         # Get values from the same row and remove from pencil_list
         for column in range(0, 9):
@@ -60,7 +60,9 @@ class Individual:
             initial_set=initial_data
     ):
         if representation is None:
+            #create representation as an empty 9x9 matrix
             self.representation = [[[] for j in range(0, 9)] for i in range(0, 9)]
+            #loop through the values of the initial sudoku set
             for row in range(0, 9):
                 for column in range(0, 9):
                     if initial_set[row][column] == 0:
@@ -97,7 +99,7 @@ class Individual:
 
 
 class Population:
-    def __init__(self, size, optim, **kwargs):
+    def __init__(self, size, optim):
         self.individuals = []
         self.size = size
         self.optim = optim

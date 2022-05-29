@@ -4,31 +4,6 @@ import numpy as np
 with open('sudoku_data.txt') as f:
     initial_data = np.loadtxt(f).reshape((9, 9)).astype(int)
 
-def binary_mutation(individual):
-    """Binary mutation for a GA individual
-
-    Args:
-        individual (Individual): A GA individual from charles.py
-
-    Raises:
-        Exception: When individual is not binary encoded.py
-
-    Returns:
-        Individual: Mutated Individual
-    """
-    mut_point = randint(0, len(individual) - 1)
-
-    if individual[mut_point] == 0:
-        individual[mut_point] = 1
-    elif individual[mut_point] == 1:
-        individual[mut_point] = 0
-    else:
-        raise Exception(
-            f"Trying to do binary mutation on {individual}. But it's not binary.")
-
-    return individual
-
-
 def swap_row_mutation(individual):
     """Swap mutation for a GA individual
 
@@ -103,27 +78,30 @@ def swap_grid_mutation(individual):
     Returns:
         Individual: Mutated Individual
     """
-    # Position of the start and end of substring
-    # select a random row of the sudoku matrix
-    mut_row = sample(range(len(individual)), 1)
-    # select 2 random indexes from that row
-    mut_points = sample(range(len(individual[mut_row[0]])), 2)
+    individual = np.array(individual).reshape((9, 9))
+    #choose grid row
+    grid_row = sample([0,3,6],1)
+    #choose grid column
+    grid_column = sample([0,3,6],1)
 
-    # store the indexes of the initial sudoku set where the value is not 0 (unchangeable values)
-    index_list = [i for i, e in enumerate(initial_data[mut_row[0]]) if e != 0]
+    #randomly choose mutation points
+    mut_points_1 = np.random.choice([0, 1, 2], size=2, replace=True)
+    mut_points_2 = np.random.choice([0, 1, 2], size=2, replace=True)
 
-    # Invert for the mutation
-    # if one of the mutation points is an unchangeable  value, sample again
-    while ((mut_points[0] in index_list) or (mut_points[1] in index_list)):
-        mut_points = sample(range(len(individual[mut_row[0]])), 2)
+    #while the value at mutation points 1 or mutation points 2 is a fixed value, or mutation points 1 equals mutation points 2, resample:
+    while(((individual[grid_row[0] + mut_points_1[0]][grid_column[0] + mut_points_1[1]]) == (initial_data[grid_row[0] + mut_points_1[0]][grid_column[0] + mut_points_1[1]]))
+        | ((individual[grid_row[0] + mut_points_2[0]][grid_column[0] + mut_points_2[1]]) == (initial_data[grid_row[0] + mut_points_2[0]][grid_column[0] + mut_points_2[1]]))
+        | (mut_points_1 == mut_points_2).all()):
+        mut_points_1 = np.random.choice([0, 1, 2], size=2, replace=True)
+        mut_points_2 = np.random.choice([0, 1, 2], size=2, replace=True)
 
-    # This method assumes that the second point is after (on the right of) the first one
-    # Sort the list
-    mut_points.sort()
-    #Swap
-    individual[mut_row[0]][mut_points[0]], individual[mut_row[0]][mut_points[1]] = individual[mut_row[0]][mut_points[1]], individual[mut_row[0]][mut_points[0]]
+    #swap values at mutation points 1 and 2
+    temp = individual[grid_row[0] + mut_points_1[0]][grid_column[0] + mut_points_1[1]]
+    individual[grid_row[0] + mut_points_1[0]][grid_column[0] + mut_points_1[1]] = individual[grid_row[0] + mut_points_2[0]][grid_column[0] + mut_points_2[1]]
+    individual[grid_row[0] + mut_points_2[0]][grid_column[0] + mut_points_2[1]] = temp
 
-    return individual
+
+    return individual.tolist()
 
 
 def random_mutation(individual):
@@ -196,5 +174,7 @@ if __name__ == '__main__':
     print(index_list)
     print(mut_row)
     print(mut_points[0] in index_list)'''
-   print(initial_data)
+   mut_points_1 = []
+   mut_points_2 = []
+   print(mut_points_2 == mut_points_1)
 

@@ -1,5 +1,6 @@
 from random import uniform, choice, sample
 from operator import attrgetter
+import numpy as np
 
 
 def fps(population):
@@ -59,10 +60,12 @@ def ranking(population):
     top_half_size = int(population.size/2)
     if population.optim == 'max':
         fitness_ranking = sorted(ranking, key=attrgetter("fitness"), reverse=True)
+        selected = np.array(sample(fitness_ranking[:top_half_size], 1)).reshape((9, 9)).astype(int).tolist()
+        return selected
 
-        return sample(fitness_ranking[:top_half_size], 1)
     elif population.optim == 'min':
         fitness_ranking = sorted(ranking, key=attrgetter("fitness"), reverse=False)
-        return sample(fitness_ranking[:top_half_size], 1)
+        selected = np.array(sample(fitness_ranking[:top_half_size], 1)).reshape((9, 9)).astype(int).tolist()
+        return selected
     else:
         raise Exception("No optimization specified (min or max).")
