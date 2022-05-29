@@ -2,10 +2,33 @@ from random import randint, uniform, sample
 import numpy as np
 import random
 
-with open('sudoku_data.txt') as f:
+with open('charles\sudoku_data.txt') as f:
     initial_data = np.loadtxt(f).reshape((9, 9)).astype(int)
 
 initial_data = np.array(initial_data).flatten(order='C').tolist()
+
+'''
+Uniform crossover samples 9 crossover points and swaps the values with matching indexes between the parents
+'''
+
+def uniform_crossover(p1,p2):
+
+    p1 = np.array(p1).flatten(order='C').tolist()
+    p2 = np.array(p2).flatten(order='C').tolist()
+
+    #sample 9 cross points
+    cross_points = sample(range(1,len(p1)-2), 9)
+
+    offspring1, offspring2 = p1,p2
+
+    #do the swap
+    for i in cross_points:
+        temp = offspring1[i]
+        offspring1[i] = offspring2[i]
+        offspring2[i] = temp
+
+
+    return np.array(offspring1).reshape((9, 9)).astype(int).tolist(),  np.array(offspring2).reshape((9, 9)).astype(int).tolist()
 
 def single_point_co(p1, p2):
     """Implementation of single point crossover.
@@ -26,7 +49,7 @@ def single_point_co(p1, p2):
     offspring1 = p1[:co_point] + p2[co_point:]
     offspring2 = p2[:co_point] + p1[co_point:]
 
-    return offspring1, offspring2
+    return  np.array(offspring1).reshape((9, 9)).astype(int).tolist(),  np.array(offspring2).reshape((9, 9)).astype(int).tolist()
 
 
 def cycle_co(p1, p2):
@@ -67,54 +90,6 @@ def cycle_co(p1, p2):
                     offspring2[index] = p1[index]
 
     return np.array(offspring1).reshape((9, 9)).astype(int).tolist(), np.array(offspring2).reshape((9, 9)).astype(int).tolist()
-
-def pmx_co(p1, p2):
-    """Implementation of partially matched/mapped crossover.
-
-    Args:
-        p1 (Individual): First parent for crossover.
-        p2 (Individual): Second parent for crossover.
-
-    Returns:
-        Individuals: Two offspring, resulting from the crossover.
-    """
-
-    #change the representation of the parents from a 2D array to 1D array using function flatten (order = C to order by row)
-    p1 = np.array(p1).flatten(order='C').tolist()
-    p2 = np.array(p2).flatten(order='C').tolist()
-
-    co_points = sample(range(len(p1)), 2)
-    co_points.sort()
-
-    # dictionary creation using the segment elements from both parents
-    # the dictionary will be working two ways
-    keys = p1[co_points[0]:co_points[1]] + p2[co_points[0]:co_points[1]]
-    values = p2[co_points[0]:co_points[1]] + p1[co_points[0]:co_points[1]]
-    # segment dictionary
-    segment = {keys[i]: values[i] for i in range(len(keys))}
-
-    # empty offsprings
-    o1 = [None] * len(p1)
-    o2 = [None] * len(p2)
-
-    # where pmx happens
-    def pmx(o, p):
-        for i, element in enumerate(p):
-            # if element not in the segment, copy
-            if element not in segment:
-                o[i] = p[i]
-            # if element in the segment, take the value of the key from
-            # segment/dictionary
-            else:
-                o[i] = segment.get(element)
-        return o
-
-    # repeat the procedure for each offspring
-    o1 = pmx(p1, p2)
-    o2 = pmx(p2, p1)
-
-    #return the offsprings as 9x9 2D list
-    return np.array(o1).reshape((9, 9)).astype(int).tolist(), np.array(o2).reshape((9, 9)).astype(int).tolist()
 
 def new_pmx_co(p1,p2):
 
@@ -207,20 +182,5 @@ if __name__ == '__main__':
     p1, p2 = [[9, 8, 4], [5, 6, 7], [1, 3, 2]], [[9, 7, 1], [2, 3, 10], [8, 5, 4]]
     #p1, p2 = [1, 2, 3, 4, 5, 6, 7, 8, 9], [9, 3, 7, 8, 2, 6, 5, 1, 4]
     #p1, p2 = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9], [0.3, 0.2, 0.3, 0.2, 0.3, 0.2, 0.3, 0.2, 0.3]
-    p1 = np.array(p1).flatten(order='C').tolist()
-    p2 = np.array(p2).flatten(order='C').tolist()
-    co_points = sample(range(len(p1)), 2)
-    co_points.sort()
-
-    o = [None] * len(p1)
-
-    o[co_points[0]:co_points[1]] = p1[co_points[0]:co_points[1]]
-
-    z = set(p2[co_points[0]:co_points[1]]) - set(p1[co_points[0]:co_points[1]])
-
-    print(co_points)
-    print(o)
-    print(z)
-
-      #p1 = np.array(p1).flatten(order='C').tolist()
+    #p1 = np.array(p1).flatten(order='C').tolist()
     #p2 = np.array(p2).flatten(order='C').tolist()

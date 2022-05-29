@@ -2,9 +2,10 @@ from random import shuffle, choice, sample, random
 from operator import attrgetter
 from copy import deepcopy
 import numpy
+import time as t
 
 '''Load the sudoku initial values (sudoku_data.txt) into a variable'''
-with open('sudoku_data.txt') as f:
+with open('charles\sudoku_data.txt') as f:
     initial_data = numpy.loadtxt(f).reshape((9, 9)).astype(int)
 
 
@@ -57,8 +58,11 @@ class Individual:
     def __init__(
             self,
             representation=None,
-            initial_set=initial_data
+            initial_set=initial_data,
+            optim=None
     ):
+        self.optim = optim
+
         if representation is None:
             #create representation as an empty 9x9 matrix
             self.representation = [[[] for j in range(0, 9)] for i in range(0, 9)]
@@ -97,19 +101,34 @@ class Individual:
     def __repr__(self):
         return f"Individual(size={len(self.representation)}); Fitness: {self.fitness}"
 
+    #returns representation as a 9x9 matrix
+    def rep_matrix(self):
+        return f"Solution: \n {numpy.array(self.representation).reshape((9, 9))}"
+
+
+
+
+
 
 class Population:
-    def __init__(self, size, optim):
+    def __init__(self, size, optim,last_gen, time_taken):
         self.individuals = []
         self.size = size
         self.optim = optim
+        self.last_gen = last_gen
+        self.time_taken = time_taken
+
 
         for _ in range(size):
             self.individuals.append(
-                Individual()
+                Individual(
+                    optim = optim
+                )
             )
 
     def evolve(self, gens, select, crossover, mutate, co_p, mu_p, elitism):
+
+        start = t.time()
 
         for gen in range(gens):
             new_pop = []
@@ -128,14 +147,16 @@ class Population:
                 else:
                     offspring1, offspring2 = parent1, parent2
                 # Mutation
+                #if (min(self, key=attrgetter("fitness")).fitness < 10):
+                 #   mu_p = 0.5
                 if random() < mu_p:
                     offspring1 = mutate(offspring1)
                 if random() < mu_p:
                     offspring2 = mutate(offspring2)
 
-                new_pop.append(Individual(representation=offspring1))
+                new_pop.append(Individual(representation=offspring1,optim = self.optim))
                 if len(new_pop) < self.size:
-                    new_pop.append(Individual(representation=offspring2))
+                    new_pop.append(Individual(representation=offspring2,optim = self.optim))
 
             if elitism:
                 if self.optim == "max":
@@ -148,9 +169,27 @@ class Population:
             self.individuals = new_pop
 
             if self.optim == "max":
-                print(f'Gen {gen}' + " - " + f'Best Individual: {max(self, key=attrgetter("fitness"))}')
+                fit_value = max(self, key=attrgetter("fitness"))
+                if (fit_value.fitness == 1):
+                    self.last_gen = gen
+                    self.time_taken = t.time() - start
+                    print('Reached global optimum - ' + f'Gen {gen}' + " - " + f'Best Individual: {max(self, key=attrgetter("fitness"))}')
+                    print(fit_value.rep_matrix())
+                    print(f'Time taken:{round(self.time_taken,4)} seconds')
+                    break
+                else:
+                    print(f'Gen {gen}' + " - " + f'Best Individual: {max(self, key=attrgetter("fitness"))}')
             elif self.optim == "min":
-                print(f'Gen {gen}' + " - " + f'Best Individual: {min(self, key=attrgetter("fitness"))}')
+                fit_value = min(self, key=attrgetter("fitness"))
+                if (fit_value.fitness == 0):
+                    self.last_gen = gen
+                    self.time_taken = t.time() - start
+                    print('Reached global optimum - ' + f'Gen {gen}' + " - " + f'Best Individual: {min(self, key=attrgetter("fitness"))}')
+                    print(fit_value.rep_matrix())
+                    print(f'Time taken: {round(self.time_taken,4)} seconds')
+                    break
+                else:
+                    print(f'Gen {gen}' + " - " + f'Best Individual: {min(self, key=attrgetter("fitness"))}')
 
     def __len__(self):
         return len(self.individuals)

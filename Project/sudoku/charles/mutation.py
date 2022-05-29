@@ -1,7 +1,7 @@
 from random import randint, sample
 import numpy as np
 
-with open('sudoku_data.txt') as f:
+with open('charles\sudoku_data.txt') as f:
     initial_data = np.loadtxt(f).reshape((9, 9)).astype(int)
 
 def swap_row_mutation(individual):
