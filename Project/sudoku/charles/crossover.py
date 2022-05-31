@@ -2,17 +2,27 @@ from random import randint, uniform, sample
 import numpy as np
 import random
 
+'''
+
+Load the initial data from the file "sudoku_data.txt"
+
+'''
+
 with open('charles\sudoku_data.txt') as f:
     initial_data = np.loadtxt(f).reshape((9, 9)).astype(int)
 
+#transform initial data into a list of 81 numbers
 initial_data = np.array(initial_data).flatten(order='C').tolist()
 
 '''
+
 Uniform crossover samples 9 crossover points and swaps the values with matching indexes between the parents
+
 '''
 
 def uniform_crossover(p1,p2):
 
+    # change the representation of the parents from a 2D array to 1D array using function flatten (order = C to order by row)
     p1 = np.array(p1).flatten(order='C').tolist()
     p2 = np.array(p2).flatten(order='C').tolist()
 
@@ -27,8 +37,10 @@ def uniform_crossover(p1,p2):
         offspring1[i] = offspring2[i]
         offspring2[i] = temp
 
-
+    # return offsprings as 9x9 2D arrays
     return np.array(offspring1).reshape((9, 9)).astype(int).tolist(),  np.array(offspring2).reshape((9, 9)).astype(int).tolist()
+
+
 
 def single_point_co(p1, p2):
     """Implementation of single point crossover.
@@ -49,49 +61,16 @@ def single_point_co(p1, p2):
     offspring1 = p1[:co_point] + p2[co_point:]
     offspring2 = p2[:co_point] + p1[co_point:]
 
-    return  np.array(offspring1).reshape((9, 9)).astype(int).tolist(),  np.array(offspring2).reshape((9, 9)).astype(int).tolist()
-
-
-def cycle_co(p1, p2):
-    """Implementation of cycle crossover.
-
-    Args:
-        p1 (Individual): First parent for crossover.
-        p2 (Individual): Second parent for crossover.
-
-    Returns:
-        Individuals: Two offspring, resulting from the crossover.
-    """
-    p1 = np.array(p1).flatten(order='C').tolist()
-    p2 = np.array(p2).flatten(order='C').tolist()
-
-    # Offspring placeholders - None values make it easy to debug for errors
-    offspring1 = [None] * len(p1)
-    offspring2 = [None] * len(p2)
-    # While there are still None values in offspring, get the first index of
-    # None and start a "cycle" according to the cycle crossover method
-    while None in offspring1:
-        index = offspring1.index(None)
-
-        val1 = p1[index]
-        val2 = p2[index]
-
-        while val1 != val2:
-            offspring1[index] = p1[index]
-            offspring2[index] = p2[index]
-            val2 = p2[index]
-            index = p1.index(val2)
-
-        for element in offspring1:
-            if element is None:
-                index = offspring1.index(None)
-                if offspring1[index] is None:
-                    offspring1[index] = p2[index]
-                    offspring2[index] = p1[index]
-
     return np.array(offspring1).reshape((9, 9)).astype(int).tolist(), np.array(offspring2).reshape((9, 9)).astype(int).tolist()
 
+'''
+
+Partially mapped crossover - code used from class
+
+'''
+
 def new_pmx_co(p1,p2):
+
 
     # change the representation of the parents from a 2D array to 1D array using function flatten (order = C to order by row)
     p1 = np.array(p1).flatten(order='C').tolist()
@@ -103,13 +82,13 @@ def new_pmx_co(p1,p2):
     co_points = sample(range(len(p1)), 2)
     co_points.sort()
 
+    # perform the crossover
     def PMX(x, y):
         o = [None] * len(x)
 
         o[co_points[0]:co_points[1]] = x[co_points[0]:co_points[1]]
 
         z = set(y[co_points[0]:co_points[1]]) - set(x[co_points[0]:co_points[1]])
-
 
         for i in z:
             temp = i
@@ -126,43 +105,17 @@ def new_pmx_co(p1,p2):
 
     o1, o2 = PMX(p1, p2), PMX(p2, p1)
 
+    #return offsprings as 9x9 2D arrays
     return np.array(o1).reshape((9, 9)).astype(int).tolist(), np.array(o2).reshape((9, 9)).astype(int).tolist()
-    #return o1,o2
 
-def arithmetic_co(p1, p2):
-    """Implementation of arithmetic crossover.
 
-    Args:
-        p1 (Individual): First parent for crossover.
-        p2 (Individual): Second parent for crossover.
+'''
 
-    Returns:
-        Individuals: Two offspring, resulting from the crossover.
-    """
-    # Offspring placeholders - None values make it easy to debug for errors
-    offspring1 = [None] * len(p1)
-    offspring2 = [None] * len(p1)
-    # Set a value for alpha between 0 and 1
-    alpha = uniform(0, 1)
-    # Take weighted sum of two parents, invert alpha for second offspring
-    for i in range(len(p1)):
-        offspring1[i] = p1[i] * alpha + (1 - alpha) * p2[i]
-        offspring2[i] = p2[i] * alpha + (1 - alpha) * p1[i]
+Row crossover - several rows are switched at random
 
-    return offspring1, offspring2
-
+'''
 
 def row_crossover(p1 , p2):
-    """Implementation of specific sudoku crossover, where several rows
-    are switched entirely and at random
-
-    Args:
-        Args:
-        p1 (Individual): First parent for crossover.
-        p2 (Individual): Second parent for crossover.
-
-    Returns:
-        Individuals: Two offspring, resulting from the crossover."""
 
     num_crossover_points = randint(2, 7)
     row_indexes = [0, 1, 2, 3, 4, 5, 6, 7, 8]

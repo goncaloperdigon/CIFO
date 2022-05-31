@@ -3,7 +3,7 @@ from operator import attrgetter
 import numpy as np
 
 
-def fps(population):
+def fps(population): # only works for maximization
     """Fitness proportionate selection implementation.
 
     Args:
@@ -32,7 +32,7 @@ def fps(population):
         raise Exception("No optimization specified (min or max).")
 
 
-def tournament(population, size=500):
+def tournament(population, size=100):
     """Tournament selection implementation.
 
     Args:
@@ -55,16 +55,23 @@ def tournament(population, size=500):
 
 
 def ranking(population):
+
+    #randomly choose (with repetition) individuals from the population
     ranking = [choice(population.individuals) for i in range(population.size)]
 
     top_half_size = int(population.size/2)
+
     if population.optim == 'max':
+        #sort individuals by fitness
         fitness_ranking = sorted(ranking, key=attrgetter("fitness"), reverse=True)
+        #select only the top half
         selected = np.array(sample(fitness_ranking[:top_half_size], 1)).reshape((9, 9)).astype(int).tolist()
         return selected
 
     elif population.optim == 'min':
+        #sort individuals by fitness
         fitness_ranking = sorted(ranking, key=attrgetter("fitness"), reverse=False)
+        #select only the top half
         selected = np.array(sample(fitness_ranking[:top_half_size], 1)).reshape((9, 9)).astype(int).tolist()
         return selected
     else:

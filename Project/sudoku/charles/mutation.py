@@ -1,19 +1,23 @@
 from random import randint, sample
 import numpy as np
 
+'''
+
+Load the initial data from the file "sudoku_data.txt"
+
+'''
+
 with open('charles\sudoku_data.txt') as f:
     initial_data = np.loadtxt(f).reshape((9, 9)).astype(int)
 
+''''
+
+Swap two random cells from a random row  
+
+'''
+
 def swap_row_mutation(individual):
-    """Swap mutation for a GA individual
 
-    Args:
-        individual (Individual): A GA individual from charles.py
-
-    Returns:
-        Individual: Mutated Individual
-    """
-    # Position of the start and end of substring
     # select a random row of the sudoku matrix
     mut_row = sample(range(len(individual)), 1)
     # select 2 random indexes from that row
@@ -22,7 +26,6 @@ def swap_row_mutation(individual):
     # store the indexes of the initial sudoku set where the value is not 0 (unchangeable values)
     index_list = [i for i, e in enumerate(initial_data[mut_row[0]]) if e != 0]
 
-    # Invert for the mutation
     # if one of the mutation points is an unchangeable  value, sample again
     while ((mut_points[0] in index_list) or (mut_points[1] in index_list)):
         mut_points = sample(range(len(individual[mut_row[0]])), 2)
@@ -36,15 +39,14 @@ def swap_row_mutation(individual):
     return individual
 
 
+''''
+
+Swap two random cells from a random column  
+
+'''
+
 def swap_column_mutation(individual):
-    """Swap mutation for a GA individual
 
-    Args:
-        individual (Individual): A GA individual from charles.py
-
-    Returns:
-        Individual: Mutated Individual
-    """
     # Position of the start and end of substring
 
     # select a random column of the sudoku matrix
@@ -68,16 +70,14 @@ def swap_column_mutation(individual):
     return individual
 
 
+''''
+
+Swap two random cells from a random grid  
+
+'''
 
 def swap_grid_mutation(individual):
-    """Swap mutation for a GA individual
 
-    Args:
-        individual (Individual): A GA individual from charles.py
-
-    Returns:
-        Individual: Mutated Individual
-    """
     individual = np.array(individual).reshape((9, 9))
     #choose grid row
     grid_row = sample([0,3,6],1)
@@ -102,6 +102,11 @@ def swap_grid_mutation(individual):
 
 
     return individual.tolist()
+
+''''
+
+Choose a random cell and change its value to a random integer from 1 to 9
+'''
 
 
 def random_mutation(individual):
@@ -142,7 +147,6 @@ def inversion_mutation(individual):
         Individual: Mutated Individual
     """
 
-    # Position of the start and end of substring
 
     #select a random row of the sudoku matrix
     mut_row = sample(range(len(individual)), 1)
@@ -152,7 +156,6 @@ def inversion_mutation(individual):
     # store the indexes of the initial sudoku set where the value is not 0 (unchangeable values)
     index_list = [i for i, e in enumerate(initial_data[mut_row[0]]) if e != 0]
 
-    # Invert for the mutation
     #if one of the mutation points is an unchangeable  value, sample again
     while ((mut_points[0] in index_list) or (mut_points[1] in index_list)):
         mut_points = sample(range(len(individual[mut_row[0]])), 2)
@@ -174,7 +177,4 @@ if __name__ == '__main__':
     print(index_list)
     print(mut_row)
     print(mut_points[0] in index_list)'''
-   mut_points_1 = []
-   mut_points_2 = []
-   print(mut_points_2 == mut_points_1)
 

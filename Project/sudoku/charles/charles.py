@@ -10,7 +10,10 @@ with open('charles\sudoku_data.txt') as f:
 
 
     # pencil mark method
+    #receives a position of the grid as parameters (i = row, j = column)
     def pencil_mark(i, j):
+
+        #possible values
         pencil_list = [i for i in range(1,10)]
 
         # Get values from the same row and remove from pencil_list
@@ -34,11 +37,14 @@ with open('charles\sudoku_data.txt') as f:
                             if (k != 0 and k in pencil_list):
                                 pencil_list.remove(k)
 
+        #returns the list with the possible values
         return pencil_list
 
 
     # returns the values of a grid
+    #i and j are always the postion of the first cell in a grid. E.g: (0,0) (0,3), (6,6)
     def find_grid(i, j):
+
         grid_list = []
 
         grid_list.append(initial_data[i][j])
@@ -70,10 +76,10 @@ class Individual:
             for row in range(0, 9):
                 for column in range(0, 9):
                     if initial_set[row][column] == 0:
-                        # Value is available.
+                        # Cell is available - pencil mark method and randomly choose one of the possible values
                         self.representation[row][column] = choice(pencil_mark(row, column))
                     elif initial_set[row][column] != 0:
-                        # Given/known value from file.
+                        # Given value from file
                         self.representation[row][column] = initial_set[row][column]
         else:
             self.representation = representation
@@ -101,7 +107,7 @@ class Individual:
     def __repr__(self):
         return f"Individual(size={len(self.representation)}); Fitness: {self.fitness}"
 
-    #returns representation as a 9x9 matrix
+    #prints representation as a 9x9 matrix
     def rep_matrix(self):
         return f"Solution: \n {numpy.array(self.representation).reshape((9, 9))}"
 

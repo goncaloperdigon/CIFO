@@ -1,14 +1,15 @@
 from charles.charles import Population, Individual
-from charles.search import hill_climb, sim_annealing
 from copy import deepcopy
 from charles.selection import fps, tournament , ranking
 from charles.mutation import swap_row_mutation, inversion_mutation, swap_column_mutation, random_mutation, swap_grid_mutation
-from charles.crossover import cycle_co, new_pmx_co, row_crossover, single_point_co, uniform_crossover
+from charles.crossover import  new_pmx_co, row_crossover, uniform_crossover, single_point_co
 import numpy
 import time
 
 """
-    Fitness function
+    Fitness function - counts the number of duplicates in entire sudoku matrix
+    NOTE: We count a pair of duplicates as 2 duplicates. E.g. If there is two 1's in a row, that row has 2 duplicates
+    
 """
 
 def get_fitness(self):
@@ -59,9 +60,11 @@ def get_fitness(self):
             # sum all the appearances of duplicates
             fitness += sum(num_of_duplicates_grid.values())
 
+    #if optimization = maximization, the fitness function changes to 1/#duplicates
     if (self.optim=="max"):
         if fitness != 0:
             fitness = 1/fitness
+        #when fitness = 0, we have found a solution, return 1 to not divide by 0
         else:
             fitness = 1
 
@@ -71,11 +74,13 @@ def get_fitness(self):
 # Monkey patching
 Individual.get_fitness = get_fitness
 
+#Performance parameters
 time = []
 number_gens = []
 failed_runs = 0
 
-for _ in range(40):
+#Change if more than 1 run needed (specify number in range of the for loop)
+for _ in range(1):
     pop = Population(
         size= 1000,
         optim="min",
@@ -97,6 +102,7 @@ for _ in range(40):
         time.append(pop.time_taken)
     else: failed_runs += 1
 
-
-print(round(numpy.average(time),3))
-print(int(numpy.average(number_gens)))
+#Print performance metrics
+print(f'Average time: {round(numpy.average(time),3)}')
+print(f'Average number of gens: {int(numpy.average(number_gens))}')
+print(f'Failed runs: {failed_runs}')
